@@ -1,5 +1,5 @@
-import { Box, Button, Flex, Heading, Input, Text } from '@chakra-ui/core'
-import { AddIcon, DragHandleIcon, EditIcon } from '@chakra-ui/icons'
+import { Box, Button, Flex, Heading, HStack, Input, Text } from '@chakra-ui/core'
+import { AddIcon, DeleteIcon, DragHandleIcon, EditIcon } from '@chakra-ui/icons'
 import React, { useState } from 'react'
 import Task from '../Task/Task'
 import { Column as _col, Task as _task, Tasks } from './../../interfaces'
@@ -9,19 +9,24 @@ interface Props {
     col: _col;
     tasks: Tasks;
     updateTitle: ((id: string, title: string) => void);
+    deleteTitle: (id: string) => void
 }
 const Column = (props: Props) => {
     const [editTitle, setEditTitle] = useState(false)
 
-    const { cId, col, tasks, updateTitle } = props
+    const { cId, col, tasks, updateTitle, deleteTitle } = props
     const [columnTitle,
         setColumnTitle] = useState(col.title)
 
-    
+
     const _updateTitle = (e: any) => {
         e.preventDefault()
         updateTitle(cId, columnTitle)
         setEditTitle(false)
+    }
+
+    const _deleteTitle = (e: any) => {
+        deleteTitle(cId)
     }
 
     return (
@@ -32,16 +37,21 @@ const Column = (props: Props) => {
                     <DragHandleIcon mr={2} />
                     {
                         !editTitle ? (<Heading size="sm">{col.title}</Heading>) : (
-                            <form  onSubmit={_updateTitle}>
+                            <form onSubmit={_updateTitle}>
                                 <Input size="xs" fontSize="xs" p={1} value={columnTitle} onChange={e => setColumnTitle(e.target.value)} />
 
                             </form>
                         )
                     }
                 </Flex>
-                <Button size="xs" onClick={e => setEditTitle(pv => !pv)}>
-                    <EditIcon />
-                </Button>
+                <HStack>
+                    <Button size="xs" onClick={e => setEditTitle(pv => !pv)}>
+                        <EditIcon />
+                    </Button>
+                    <Button size="xs" colorScheme="red" onClick={_deleteTitle}>
+                        <DeleteIcon />
+                    </Button>
+                </HStack>
             </Flex>
             <Box>
                 {

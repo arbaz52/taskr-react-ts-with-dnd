@@ -4,13 +4,17 @@ import React, { useEffect, useState } from 'react';
 import './App.scss';
 import Column from './components/Column/Column';
 import Header from './components/Header/Header';
+import AddColumnModal from './components/modals/AddColumnModal/AddColumnModal';
 import { State } from './interfaces';
+import { v4 as uuidv4 } from 'uuid';
+
+import { Column as _col } from './interfaces'
 
 const App = () => {
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen: isAddColumnModalOpen, onOpen: onAddColumnModalOpen, onClose: onAddColumnModalClose } = useDisclosure()
   useEffect(() => {
-    onOpen()
+    onAddColumnModalOpen()
   }, [])
 
   const initialState: State = {
@@ -52,6 +56,35 @@ const App = () => {
       }
     })
   }
+  const addColumn = (title: string) => {
+    const id = uuidv4()
+    const col: _col = {
+      title, tasks: []
+    }
+    setState({
+      ...state,
+      columns: {
+        ...state.columns,
+        [id]: col
+      }
+    })
+  }
+  const deleteTitle = (id: string) => {
+    // console.log(id)
+    setState({
+      ...state,
+      columns: {
+        ...Object.keys(state.columns).reduce((pv, cv, ci, arr) => {
+          // console.log(pv, cv, ci, arr)
+          const col = state.columns[cv];
+          if (cv !== id)
+            return { ...pv, [cv]: col }
+          else
+            return pv
+        }, {})
+      }
+    })
+  }
 
   return (
     <ChakraProvider theme={theme}>
@@ -59,25 +92,28 @@ const App = () => {
       <Header />
       <Box p={4}>
         <Heading size="lg">Welcome to taskr.</Heading>
-        <Flex mt={4} direction="row">
-          {
-            Object.keys(state.columns).map(cId => {
-              const col = state.columns[cId];
-              return (
-                <Column key={cId} col={col} cId={cId} tasks={state.tasks} updateTitle={updateTitle}/>
-              )
-            })
-          }
-          <Box w={300} m={3} >
-            <Button colorScheme="pink" size="sm">
-              <AddIcon fontSize="xs" mr={2} />
+        <Box overflow="auto" w="100%">
+          <Flex mt={4} direction="row" width={(Object.keys(state.columns).length * 320 + 300)}>
+            {
+              Object.keys(state.columns).map(cId => {
+                const col = state.columns[cId];
+                return (
+                  <Column key={cId} col={col} cId={cId} tasks={state.tasks} updateTitle={updateTitle} deleteTitle={deleteTitle} />
+                )
+              })
+            }
+            <Box w={300} m={3} >
+              <Button colorScheme="pink" size="sm" onClick={onAddColumnModalOpen}>
+                <AddIcon fontSize="xs" mr={2} />
               Add a new Column
               </Button>
-          </Box>
+            </Box>
 
-        </Flex>
+          </Flex>
+        </Box>
       </Box>
 
+      {/* 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -101,32 +137,9 @@ const App = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+ */}
 
-
-
-      
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add a new Column</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack>
-              <Input placeholder="Title" />
-              <Text as="p" fontSize="sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed, repellendus.
-            </Text>
-            </Stack>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button size="sm" colorScheme="red" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button size="sm" variant="ghost">Add Column</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <AddColumnModal isOpen={isAddColumnModalOpen} onClose={onAddColumnModalClose} addColumn={addColumn} />
     </ChakraProvider>
   );
 }
