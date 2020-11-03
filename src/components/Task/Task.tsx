@@ -1,5 +1,5 @@
-import { Box, Button, Flex, Heading, HStack, Stack, Text } from '@chakra-ui/core'
-import { DeleteIcon, DragHandleIcon, ViewIcon } from '@chakra-ui/icons'
+import { Box, Flex, Heading, Text } from '@chakra-ui/core'
+import { DragHandleIcon } from '@chakra-ui/icons'
 import React from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import { Task as _task } from '../../interfaces'

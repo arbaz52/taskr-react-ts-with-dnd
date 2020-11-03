@@ -3,7 +3,7 @@ import { AddIcon, DeleteIcon, DragHandleIcon, EditIcon } from '@chakra-ui/icons'
 import React, { useState } from 'react'
 import { Draggable, Droppable } from 'react-beautiful-dnd'
 import Task from '../Task/Task'
-import { Column as _col, Task as _task, Tasks } from './../../interfaces'
+import { Column as _col, Tasks } from './../../interfaces'
 
 interface Props {
     cId: string;
@@ -11,13 +11,13 @@ interface Props {
     tasks: Tasks;
     index: number;
     updateTitle: (id: string, title: string) => void;
-    deleteTitle: (id: string) => void;
+    deleteColumn: (id: string) => void;
     onAddTaskModalOpen: (cId: string) => void;
 }
 const Column = (props: Props) => {
     const [editTitle, setEditTitle] = useState(false)
 
-    const { cId, col, tasks, updateTitle, deleteTitle, onAddTaskModalOpen, index } = props
+    const { cId, col, tasks, updateTitle, deleteColumn, onAddTaskModalOpen, index } = props
     const [columnTitle,
         setColumnTitle] = useState(col.title)
 
@@ -28,8 +28,8 @@ const Column = (props: Props) => {
         setEditTitle(false)
     }
 
-    const _deleteTitle = (e: any) => {
-        deleteTitle(cId)
+    const _deleteColumn = (e: any) => {
+        deleteColumn(cId)
     }
 
     return (
@@ -57,13 +57,14 @@ const Column = (props: Props) => {
                                     <Button size="xs" onClick={e => setEditTitle(pv => !pv)}>
                                         <EditIcon />
                                     </Button>
-                                    <Button size="xs" colorScheme="red" onClick={_deleteTitle}>
+                                    <Button size="xs" colorScheme="red" onClick={_deleteColumn}>
                                         <DeleteIcon />
                                     </Button>
                                 </HStack>
                             </Flex>
                             <Droppable
-                                droppableId={cId}>
+                                droppableId={cId}
+                                type="task">
                                 {
                                     (provided, snapshot) => {
                                         return (

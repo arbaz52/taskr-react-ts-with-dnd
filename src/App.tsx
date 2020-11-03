@@ -79,7 +79,7 @@ const App = () => {
       columnsSequence: [...state.columnsSequence, id]
     })
   }
-  const deleteTitle = (id: string) => {
+  const deleteColumn = (id: string) => {
     // console.log(id)
     setState({
       ...state,
@@ -93,7 +93,7 @@ const App = () => {
             return pv
         }, {})
       },
-      columnsSequence: state.columnsSequence.filter(cId => cId != id)
+      columnsSequence: state.columnsSequence.filter(cId => cId !== id)
     })
   }
 
@@ -119,8 +119,45 @@ const App = () => {
       }
     })
   }
-  const handleOnDragEnd = (result: DropResult, provided: ResponderProvided) => {
 
+
+  const handleOnDragEnd = (result: DropResult, provided: ResponderProvided) => {
+    // console.log(result, provided)
+    const { source, destination, draggableId } = result
+
+    if (destination == null)
+      return
+
+    switch (result.type) {
+      case "column":
+        let columnsSequence = state.columnsSequence
+        let cId = columnsSequence.splice(source.index, 1)[0]
+        columnsSequence.splice(destination.index, 0, cId)
+        setState({
+          ...state,
+          columnsSequence
+        })
+        break
+
+      case "task":
+        let sourceTasksList = [...state.columns[source.droppableId].tasks]
+        let destinationTasksList = [...state.columns[destination.droppableId].tasks]
+        let tId = sourceTasksList.splice(source.index, 1)[0]
+
+        if (source.droppableId === destination.droppableId)
+          destinationTasksList = sourceTasksList
+
+        destinationTasksList.splice(destination.index, 0, tId)
+        setState({
+          ...state,
+          columns: {
+            ...state.columns,
+            [source.droppableId]: { ...state.columns[source.droppableId], tasks: sourceTasksList },
+            [destination.droppableId]: { ...state.columns[destination.droppableId], tasks: destinationTasksList }
+          }
+        })
+        break
+    }
   }
   return (
     <ChakraProvider theme={theme}>
@@ -141,7 +178,7 @@ const App = () => {
                         state.columnsSequence.map((cId, index) => {
                           const col = state.columns[cId];
                           return (
-                            <Column key={cId} col={col} index={index} cId={cId} tasks={state.tasks} updateTitle={updateTitle} deleteTitle={deleteTitle} onAddTaskModalOpen={preOnAddTaskModalOpen} />
+                            <Column key={cId} col={col} index={index} cId={cId} tasks={state.tasks} updateTitle={updateTitle} deleteColumn={deleteColumn} onAddTaskModalOpen={preOnAddTaskModalOpen} />
                           )
                         })
                       }
