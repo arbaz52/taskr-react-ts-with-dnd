@@ -5,14 +5,25 @@ import './App.scss';
 import Column from './components/Column/Column';
 import Header from './components/Header/Header';
 import AddColumnModal from './components/modals/AddColumnModal/AddColumnModal';
-import { State } from './interfaces';
+import { State, Task } from './interfaces';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Column as _col } from './interfaces'
+import AddTaskModal from './components/modals/AddTaskModal/AddTaskModal';
 
 const App = () => {
+  
 
   const { isOpen: isAddColumnModalOpen, onOpen: onAddColumnModalOpen, onClose: onAddColumnModalClose } = useDisclosure()
+  const { isOpen: isAddTaskModalOpen, onOpen: onAddTaskModalOpen, onClose: onAddTaskModalClose } = useDisclosure()
+  
+  const [selectedColumnToAddTaskIn, setSelectedColumnToAddTaskIn] = useState<string | null>(null)
+  const preOnAddTaskModalOpen = (cId: string) => {
+    setSelectedColumnToAddTaskIn(cId)
+    onAddTaskModalOpen()
+  }
+
+
   useEffect(() => {
     onAddColumnModalOpen()
   }, [])
@@ -86,6 +97,29 @@ const App = () => {
     })
   }
 
+
+  const addTask = (title: string, body: string, added_at: Date) => {
+    const id = uuidv4()
+    const task: Task = {title, body, added_at}
+    if(selectedColumnToAddTaskIn == null)
+      return
+
+    let col = state.columns[selectedColumnToAddTaskIn]
+    col = { ...col, tasks: [...col.tasks, id]}
+    setState({
+      ...state,
+      tasks: {
+        ...state.tasks,
+        [id]: task
+      },
+
+      columns: {
+        ...state.columns,
+        [selectedColumnToAddTaskIn]: col
+      }
+    })
+  }
+
   return (
     <ChakraProvider theme={theme}>
       <CSSReset />
@@ -98,7 +132,7 @@ const App = () => {
               Object.keys(state.columns).map(cId => {
                 const col = state.columns[cId];
                 return (
-                  <Column key={cId} col={col} cId={cId} tasks={state.tasks} updateTitle={updateTitle} deleteTitle={deleteTitle} />
+                  <Column key={cId} col={col} cId={cId} tasks={state.tasks} updateTitle={updateTitle} deleteTitle={deleteTitle} onAddTaskModalOpen={preOnAddTaskModalOpen} />
                 )
               })
             }
@@ -113,32 +147,7 @@ const App = () => {
         </Box>
       </Box>
 
-      {/* 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add a new Task</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack>
-              <Input placeholder="Task title" />
-              <Textarea placeholder="Task Description | Content" />
-              <Text as="p" fontSize="sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed, repellendus.
-            </Text>
-            </Stack>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button size="sm" colorScheme="red" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button size="sm" variant="ghost">Add Task</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
- */}
-
+      <AddTaskModal isOpen={isAddTaskModalOpen} onClose={onAddTaskModalClose} addTask={addTask}/>
       <AddColumnModal isOpen={isAddColumnModalOpen} onClose={onAddColumnModalClose} addColumn={addColumn} />
     </ChakraProvider>
   );

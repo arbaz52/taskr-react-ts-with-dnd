@@ -8,13 +8,14 @@ interface Props {
     cId: string;
     col: _col;
     tasks: Tasks;
-    updateTitle: ((id: string, title: string) => void);
-    deleteTitle: (id: string) => void
+    updateTitle: (id: string, title: string) => void;
+    deleteTitle: (id: string) => void;
+    onAddTaskModalOpen: (cId: string) => void;
 }
 const Column = (props: Props) => {
     const [editTitle, setEditTitle] = useState(false)
 
-    const { cId, col, tasks, updateTitle, deleteTitle } = props
+    const { cId, col, tasks, updateTitle, deleteTitle, onAddTaskModalOpen } = props
     const [columnTitle,
         setColumnTitle] = useState(col.title)
 
@@ -64,7 +65,7 @@ const Column = (props: Props) => {
                 }
             </Box>
             <Box px={3} textAlign="right" my={4}>
-                <Button colorScheme="pink" size="xs">
+                <Button colorScheme="pink" size="xs" onClick={e=>onAddTaskModalOpen(cId)}>
                     <AddIcon fontSize="0.5rem" mr={2} />
            Task
         </Button>
