@@ -15,5 +15,6 @@ export interface Columns {
 }
 export interface State {
     tasks: Tasks,
-    columns: Columns
+    columns: Columns,
+    columnsSequence: string[]
 }
