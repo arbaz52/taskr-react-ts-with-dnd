@@ -123,7 +123,7 @@ const App = () => {
 
   const handleOnDragEnd = (result: DropResult, provided: ResponderProvided) => {
     // console.log(result, provided)
-    const { source, destination, draggableId } = result
+    const { source, destination } = result
 
     if (destination == null)
       return
@@ -140,13 +140,9 @@ const App = () => {
         break
 
       case "task":
-        let sourceTasksList = [...state.columns[source.droppableId].tasks]
-        let destinationTasksList = [...state.columns[destination.droppableId].tasks]
+        let sourceTasksList = state.columns[source.droppableId].tasks
+        let destinationTasksList = state.columns[destination.droppableId].tasks
         let tId = sourceTasksList.splice(source.index, 1)[0]
-
-        if (source.droppableId === destination.droppableId)
-          destinationTasksList = sourceTasksList
-
         destinationTasksList.splice(destination.index, 0, tId)
         setState({
           ...state,
@@ -159,12 +155,13 @@ const App = () => {
         break
     }
   }
+
   return (
     <ChakraProvider theme={theme}>
       <CSSReset />
       <Header />
       <Box p={4}>
-        <Heading size="lg">Welcome to taskr.</Heading>
+        <Heading size="lg">Welcome to taskrrrr.</Heading>
         <DragDropContext
           onDragEnd={handleOnDragEnd}>
 
